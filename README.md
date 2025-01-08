@@ -43,7 +43,7 @@ PM> add-migration MigracionInicial
 PM> update-database
 ```
 
-### **4.Ejecutar el Proyecto en Local**
+### **4. Ejecutar el Proyecto en Local**
 
 1. Abre los proyectos EmailAPI y ParqueaderoEmail en tu Visual Studio 
 2. Selecciona el perfil de inicio deseado (por defecto: `IIS Express`).  
@@ -54,6 +54,6 @@ PM> update-database
 - ParqueaderoAPI: **https://localhost:7245** (HTTPS)
 - EmailAPI: **https://localhost:7076** (HTTPS)
 
-### **5.Descarga y copia la colección de POSTMAN, con cada request documentado**
+### **5. Descarga y copia la colección de POSTMAN, con cada request documentado**
 
 https://github.com/elprogramador2024/ParqueaderoAPI/blob/master/ParqueaderoAPI/Resources/swagger.json
