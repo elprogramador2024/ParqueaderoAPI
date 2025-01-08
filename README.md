@@ -8,7 +8,7 @@ Antes de comenzar, asegúrate de tener lo siguiente instalado en tu máquina loc
 
 - **[.NET SDK 8.0 o superior](https://dotnet.microsoft.com/download)**  
 - **[SQL Server](https://www.microsoft.com/sql-server/sql-server-downloads)** o cualquier base de datos que el proyecto utilice (configurable en el archivo `appsettings.json`).  
-- **[Visual Studio 2022](https://visualstudio.microsoft.com/)** o **[Visual Studio Code](https://code.visualstudio.com/)** con extensiones de .NET y C#.  
+- **[Visual Studio 2022](https://visualstudio.microsoft.com/)**.  
 - **Git** para clonar el repositorio.  
 
 ## **Configuración Inicial**
