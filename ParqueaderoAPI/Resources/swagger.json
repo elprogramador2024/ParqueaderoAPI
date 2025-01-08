@@ -1,0 +1,752 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ParqueaderoAPI",
+    "description": "API Rest para el control de vehículos por parqueaderos.",
+    "contact": {
+      "name": "Jonathan Macias",
+      "email": "jemacias464@gmail.com"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/Indicadores/topvehiculos": {
+      "get": {
+        "tags": [
+          "Indicadores"
+        ],
+        "summary": "Obtiene los 10 vehículos más frecuentes en un parqueadero específico.",
+        "description": "- Este endpoint permite a usuarios con rol **ADMIN** o **SOCIO** obtener los vehículos más frecuentes en un parqueadero.\r\n- El límite predeterminado es 10.\r\n- Se valida que el parqueadero exista antes de realizar la consulta.",
+        "parameters": [
+          {
+            "name": "parqueaderoId",
+            "in": "query",
+            "description": "ID del parqueadero.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de los 10 vehículos mas registrados en un parqueadero y su cantidad de registros (List VehiculoCant)"
+          },
+          "400": {
+            "description": "Error al validar el parqueadero (mensaje)"
+          }
+        }
+      }
+    },
+    "/Indicadores/vehprimeravez": {
+      "get": {
+        "tags": [
+          "Indicadores"
+        ],
+        "summary": "Obtiene una lista de vehículos ingresados por primera vez a un parqueadero.",
+        "description": "- Este endpoint permite a usuarios con rol **ADMIN** o **SOCIO** consultar vehículos que ingresaron por primera vez a un parqueadero.\r\n- Se valida que el parqueadero exista.",
+        "parameters": [
+          {
+            "name": "parqueaderoId",
+            "in": "query",
+            "description": "ID del parqueadero.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de vehiculos parqueados por primera vez registrados (List Vehiculo)"
+          },
+          "400": {
+            "description": "Error al validar el parqueadero (mensaje)"
+          }
+        }
+      }
+    },
+    "/Indicadores/GananciasByParquedero": {
+      "get": {
+        "tags": [
+          "Indicadores"
+        ],
+        "summary": "Obtiene las ganancias de un parqueadero en rango actual DIARIO (1), SEMANAL(7), MENSUAL(30), ANUAL(365).",
+        "description": "- Este endpoint permite a usuarios con rol **SOCIO** consultar las ganancias de su parqueadero.\r\n- Se calcula automáticamente el rango actual de fechas basado en los días proporcionados.\r\n- Se valida que el parqueadero exista.",
+        "requestBody": {
+          "description": "Información del parqueadero y el rango de días.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoRangoVM"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoRangoVM"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoRangoVM"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Devuelve las ganancias del parqueadero (IngresosParqueadero)"
+          },
+          "400": {
+            "description": "Error al validar el parqueadero (mensaje)"
+          }
+        }
+      }
+    },
+    "/Indicadores/TopGanaciasBySocio": {
+      "get": {
+        "tags": [
+          "Indicadores"
+        ],
+        "summary": "Obtiene los 3 socios con mayores ingresos en la última semana.",
+        "description": "- Este endpoint permite a usuarios con rol **ADMIN** consultar los 3 socios con mayores ingresos en la última semana.\r\n- El rango de fechas es predeterminado a semanal.",
+        "responses": {
+          "200": {
+            "description": "Lista de los 3 socios con mayores ingresos (List IngresosUser)"
+          }
+        }
+      }
+    },
+    "/Indicadores/TopGanaciasByParq": {
+      "get": {
+        "tags": [
+          "Indicadores"
+        ],
+        "summary": "Obtiene los 3 parqueaderos con mayores ingresos en la última semana.",
+        "description": "- Este endpoint permite a usuarios con rol **ADMIN** consultar los 3 parqueaderos con mayores ingresos en la última semana.\r\n- El rango de fechas es predeterminado a semanal.",
+        "responses": {
+          "200": {
+            "description": "Lista de los 3 parqueaderos con mayores ingresos (List IngresosParqueadero)"
+          }
+        }
+      }
+    },
+    "/Parqueadero": {
+      "get": {
+        "tags": [
+          "Parqueadero"
+        ],
+        "summary": "Obtiene una lista paginada de parqueaderos.",
+        "description": "- Este endpoint permite a los usuarios con rol **ADMIN** o **SOCIO** obtener una lista paginada de parqueaderos.\r\n- Si el usuario tiene el rol **SOCIO**, solo verá parqueaderos asociados a su cuenta.",
+        "parameters": [
+          {
+            "name": "pgnum",
+            "in": "query",
+            "description": "Número de página (1 por defecto).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pgsize",
+            "in": "query",
+            "description": "Tamaño de página (5 por defecto).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de parqueaderos (List Parqueadero)"
+          }
+        }
+      }
+    },
+    "/Parqueadero/BySocio": {
+      "get": {
+        "tags": [
+          "Parqueadero"
+        ],
+        "summary": "Obtiene una lista paginada de parqueaderos asociados a un socio específico.",
+        "description": "- Este endpoint es accesible solo por usuarios con rol **ADMIN** y permite consultar los parqueaderos asociados a un socio específico.",
+        "parameters": [
+          {
+            "name": "socioId",
+            "in": "query",
+            "description": "ID del socio.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pgnum",
+            "in": "query",
+            "description": "Número de página (1 por defecto).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pgsize",
+            "in": "query",
+            "description": "Tamaño de página (5 por defecto).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de parqueaderos (List Parqueadero)"
+          }
+        }
+      }
+    },
+    "/Parqueadero/insert": {
+      "post": {
+        "tags": [
+          "Parqueadero"
+        ],
+        "summary": "Inserta un nuevo parqueadero.",
+        "description": "- Este endpoint permite a los usuarios con rol **ADMIN** crear un nuevo parqueadero.\r\n- Se valida que el socio asociado exista antes de crear el parqueadero.",
+        "requestBody": {
+          "description": "Información del parqueadero a insertar.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoVM"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoVM"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoVM"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "\"Parqueadero creado exitosamente! (mensaje)"
+          },
+          "400": {
+            "description": "Error en la validación o en el proceso de inserción (mensaje)"
+          }
+        }
+      }
+    },
+    "/Parqueadero/update": {
+      "put": {
+        "tags": [
+          "Parqueadero"
+        ],
+        "summary": "Actualiza la información de un parqueadero existente.",
+        "description": "- Este endpoint permite a los usuarios con rol **ADMIN** actualizar la información de un parqueadero existente.\r\n- Se valida que el socio asociado exista.",
+        "requestBody": {
+          "description": "Información del parqueadero a actualizar.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoVM"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoVM"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParqueaderoVM"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parqueadero actualizado exitosamente! (mensaje)"
+          },
+          "400": {
+            "description": "Error de validación o actualización (mensaje)"
+          }
+        }
+      }
+    },
+    "/Parqueadero/delete": {
+      "delete": {
+        "tags": [
+          "Parqueadero"
+        ],
+        "summary": "Elimina un parqueadero existente.",
+        "description": "- Este endpoint permite a los usuarios con rol **ADMIN** eliminar un parqueadero existente.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "ID del parqueadero a eliminar.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parqueadero eliminado exitosamente! (mensaje)"
+          },
+          "400": {
+            "description": "El parqueadero no existe o no se pudo eliminar (mensaje)"
+          }
+        }
+      }
+    },
+    "/RegistroVehiculo/registrar": {
+      "post": {
+        "tags": [
+          "RegistroVehiculo"
+        ],
+        "summary": "Registra el ingreso o salida de un vehículo en un parqueadero.",
+        "description": "- El rol necesario para acceder a este endpoint es **SOCIO**.\r\n- En el caso de ingreso, se registra la fecha de ingreso y el ID del parqueadero en el vehículo.  \r\n- En el caso de salida, se registra la fecha de salida en registroVehiculo y se actualiza el estado del vehículo.",
+        "requestBody": {
+          "description": "Información del vehículo y tipo de registro (INGRESO/SALIDA).",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroVehiculoVM"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroVehiculoVM"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroVehiculoVM"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Registro ingresado/actualizado exitosamente! y mensaje de EmailAPI (retorna mensaje y Vehiculo/RegistroVehiculo)"
+          },
+          "400": {
+            "description": "Error en la validación de los datos (mensaje)"
+          }
+        }
+      }
+    },
+    "/Usuario": {
+      "get": {
+        "tags": [
+          "Usuario"
+        ],
+        "summary": "Obtiene todos los usuarios registrados.",
+        "responses": {
+          "200": {
+            "description": "Lista de Usuarios (List UsuarioVM)"
+          }
+        }
+      }
+    },
+    "/Usuario/login": {
+      "post": {
+        "tags": [
+          "Usuario"
+        ],
+        "summary": "Inicia sesión de usuario.",
+        "requestBody": {
+          "description": "Credenciales de inicio de sesión del usuario.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginVM"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginVM"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginVM"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inicio de sesión exitoso (retorna token y username)."
+          },
+          "401": {
+            "description": "Usuario no vállido. Credenciales incorrectas. (mensaje)"
+          }
+        }
+      }
+    },
+    "/Usuario/logout": {
+      "post": {
+        "tags": [
+          "Usuario"
+        ],
+        "summary": "Cierra la sesión del usuario y agrega el token a la lista negra.",
+        "responses": {
+          "200": {
+            "description": "Ha cerrado sesión correctamente! (mensaje)"
+          },
+          "400": {
+            "description": "El Token es requerido (mensaje)"
+          }
+        }
+      }
+    },
+    "/Usuario/insert": {
+      "post": {
+        "tags": [
+          "Usuario"
+        ],
+        "summary": "Inserta un nuevo usuario en el sistema.",
+        "requestBody": {
+          "description": "Datos del usuario a registrar.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroUsuarioVM"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroUsuarioVM"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistroUsuarioVM"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Usuario creado exitosamente! (retorna mensaje y UsuarioVM)"
+          },
+          "400": {
+            "description": "Error en la validación de los datos (mensaje)"
+          }
+        }
+      }
+    },
+    "/Usuario/update": {
+      "put": {
+        "tags": [
+          "Usuario"
+        ],
+        "summary": "Actualiza los datos de un usuario existente.",
+        "requestBody": {
+          "description": "Datos del usuario a actualizar.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioVM"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioVM"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioVM"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado exitosamente! (retorna mensaje y UsuarioVM)"
+          },
+          "400": {
+            "description": "Error en la validación de los datos (mensaje)"
+          }
+        }
+      }
+    },
+    "/Usuario/delete": {
+      "delete": {
+        "tags": [
+          "Usuario"
+        ],
+        "summary": "Elimina un usuario del sistema.",
+        "requestBody": {
+          "description": "Datos del usuario a eliminar.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioVM"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioVM"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioVM"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado exitosamente! (mensaje)"
+          },
+          "400": {
+            "description": "Error al intentar eliminar el usuario (mensaje)"
+          }
+        }
+      }
+    },
+    "/Vehiculo/VehiculosByParqueadero": {
+      "get": {
+        "tags": [
+          "Vehiculo"
+        ],
+        "summary": "Obtiene una lista de vehículos asociados a un parqueadero específico.",
+        "description": "- Los usuarios con rol **ADMIN** pueden consultar cualquier parqueadero.  \r\n- Los usuarios con rol **SOCIO** solo pueden consultar parqueaderos asociados a su cuenta.",
+        "parameters": [
+          {
+            "name": "parqueaderoId",
+            "in": "query",
+            "description": "ID del parqueadero del que se desea obtener los vehículos.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de vehículos (List Vehiculo)"
+          },
+          "400": {
+            "description": "Parqueadero no existe o parqueadero no asociado a su cuenta con rol SOCIO (mensaje)"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LoginVM": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string",
+            "format": "password"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ParqueaderoRangoVM": {
+        "required": [
+          "parqueaderoId",
+          "rangoDias"
+        ],
+        "type": "object",
+        "properties": {
+          "parqueaderoId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rangoDias": {
+            "$ref": "#/components/schemas/RangoDias"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ParqueaderoVM": {
+        "required": [
+          "capacidad",
+          "costoHora",
+          "direccion",
+          "nombre",
+          "socioId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "direccion": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "capacidad": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "costoHora": {
+            "type": "number",
+            "format": "double"
+          },
+          "socioId": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RangoDias": {
+        "enum": [
+          1,
+          7,
+          30,
+          365
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "RegistroUsuarioVM": {
+        "required": [
+          "email",
+          "id",
+          "nombre",
+          "password",
+          "rol"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "nombre": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "rol": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 100,
+            "minLength": 5,
+            "type": "string",
+            "format": "password"
+          },
+          "confirmPassword": {
+            "type": "string",
+            "format": "password",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegistroVehiculoVM": {
+        "required": [
+          "parqueaderoId",
+          "placa",
+          "tipoRegistro"
+        ],
+        "type": "object",
+        "properties": {
+          "parqueaderoId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "placa": {
+            "maxLength": 6,
+            "minLength": 0,
+            "pattern": "^[a-zA-Z0-9]+$",
+            "type": "string"
+          },
+          "tipoRegistro": {
+            "$ref": "#/components/schemas/TipoRegistro"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TipoRegistro": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "UsuarioVM": {
+        "required": [
+          "email",
+          "id",
+          "nombre",
+          "rol"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "nombre": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "rol": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
